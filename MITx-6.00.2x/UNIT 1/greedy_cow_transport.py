@@ -51,7 +51,7 @@ def greedy_cow_transport(cows,limit=10):
     transported on a particular trip and the overall list containing all the
     trips
     """
-    # Create copy of cows dictionary
+    # Create copy of cows dictionary and sort it heaviest first
     cowsCopy = sorted(cows.items(), key=lambda x: x[1], reverse=True)
     # Empy transport list
     trip = []
