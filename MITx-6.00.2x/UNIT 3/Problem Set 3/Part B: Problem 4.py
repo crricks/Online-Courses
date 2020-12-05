@@ -18,48 +18,111 @@
 #
 # PROBLEM 4
 #
-def simulationWithDrug(numViruses, maxPop, maxBirthProb, clearProb, resistances,
-                       mutProb, numTrials):
-    """
-    Runs simulations and plots graphs for problem 5.
 
-    For each of numTrials trials, instantiates a patient, runs a simulation for
-    150 timesteps, adds guttagonol, and runs the simulation for an additional
-    150 timesteps.  At the end plots the average virus population size
-    (for both the total virus population and the guttagonol-resistant virus
-    population) as a function of time.
-
-    numViruses: number of ResistantVirus to create for patient (an integer)
-    maxPop: maximum virus population for patient (an integer)
-    maxBirthProb: Maximum reproduction probability (a float between 0-1)        
-    clearProb: maximum clearance probability (a float between 0-1)
-    resistances: a dictionary of drugs that each ResistantVirus is resistant to
-                 (e.g., {'guttagonol': False})
-    mutProb: mutation probability for each ResistantVirus particle
-             (a float between 0-1). 
-    numTrials: number of simulation runs to execute (an integer)
-    
+class TreatedPatient(Patient):
     """
-    totPop, resistPop = [], []
-    for trial in range(numTrials): 
-        viruses = [ResistantVirus(maxBirthProb, clearProb, resistances, mutProb) for virus in range(numViruses)]
-        janeDoe = TreatedPatient(viruses, maxPop)
-        for step in range(300):
-            if trial == 0: 
-                totPop.append(janeDoe.update())
-                resistPop.append(janeDoe.getResistPop(['guttagonol']))
-            if step == 150: 
-                janeDoe.addPrescription('guttagnol')
-            totPop[step] += janeDoe.update()
-            resistPop[step] += janeDoe.getResistPop(['guttagonol'])
+    Representation of a patient. The patient is able to take drugs and his/her
+    virus population can acquire resistance to the drugs he/she takes.
+    """
+
+    def __init__(self, viruses, maxPop):
+        """
+        Initialization function, saves the viruses and maxPop parameters as
+        attributes. Also initializes the list of drugs being administered
+        (which should initially include no drugs).              
+
+        viruses: The list representing the virus population (a list of
+        virus instances)
+
+        maxPop: The  maximum virus population for this patient (an integer)
+        """
+        self.drugs = []
+        super().__init__(viruses, maxPop)
+
+
+    def addPrescription(self, newDrug):
+        """
+        Administer a drug to this patient. After a prescription is added, the
+        drug acts on the virus population for all subsequent time steps. If the
+        newDrug is already prescribed to this patient, the method has no effect.
+
+        newDrug: The name of the drug to administer to the patient (a string).
+
+        postcondition: The list of drugs being administered to a patient is updated
+        """
+
+        if newDrug not in self.drugs: 
+            self.drugs.append(newDrug)
             
-    totPop = [i/numTrials for i in totPop]
-    resistPop = [i/numTrials for i in resistPop]
-    
-    pylab.plot(totPop, label = "Total Pop")
-    pylab.plot(resistPop, label = "Resistant Pop")
-    pylab.title("SimpleVirus simulation")
-    pylab.xlabel("Time Steps")
-    pylab.ylabel("Average Virus Population")
-    pylab.legend(loc = "best")
-    pylab.show()
+
+
+    def getPrescriptions(self):
+        """
+        Returns the drugs that are being administered to this patient.
+
+        returns: The list of drug names (strings) being administered to this
+        patient.
+        """
+        
+        return self.drugs
+
+
+    def getResistPop(self, drugResist):
+        """
+        Get the population of virus particles resistant to the drugs listed in
+        drugResist.       
+
+        drugResist: Which drug resistances to include in the population (a list
+        of strings - e.g. ['guttagonol'] or ['guttagonol', 'srinol'])
+
+        returns: The population of viruses (an integer) with resistances to all
+        drugs in the drugResist list.
+        """
+        self.popResistant = 0
+        for virus in self.viruses: 
+            for drug in drugResist:
+                if virus.isResistantTo(drug): 
+                    self.popResistant += 1
+                    break
+                
+        return self.popResistant
+
+
+    def update(self):
+        """
+        Update the state of the virus population in this patient for a single
+        time step. update() should execute these actions in order:
+
+        - Determine whether each virus particle survives and update the list of
+          virus particles accordingly
+
+        - The current population density is calculated. This population density
+          value is used until the next call to update().
+
+        - Based on this value of population density, determine whether each 
+          virus particle should reproduce and add offspring virus particles to 
+          the list of viruses in this patient.
+          The list of drugs being administered should be accounted for in the
+          determination of whether each virus particle reproduces.
+
+        returns: The total virus population at the end of the update (an
+        integer)
+        """
+
+        virusesCopy = self.viruses[:]
+        
+        for virus in virusesCopy: 
+            if virus.doesClear():
+                self.viruses.remove(virus)
+        
+        popDens = len(self.viruses) / self.maxPop
+        
+        virusesCopy = self.viruses[:]
+        for virus in virusesCopy: 
+            try:
+                self.viruses.append(virus.reproduce(popDens, self.drugs))
+            except NoChildException:
+                continue
+        
+        return self.getTotalPop()
+
