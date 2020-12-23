@@ -43,8 +43,9 @@ public class Exercise08_09 {
         
         if (isValid(board, row, column)) {
             board[row][column] = player;
+        } else {
+            System.out.println("Please enter a valid entry");
         }
-        System.out.println("Please enter a valid entry");
     }
     
     // Returns true if cell is empty and entry is in the 3x3 array
@@ -126,6 +127,7 @@ public class Exercise08_09 {
                 }
             }
         }
+        System.out.println("It's a draw.")
         return true;
     }
     
