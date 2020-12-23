@@ -1,20 +1,13 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
-/*********************************************************************************
-* (Algebra: multiply two matrices) Write a method to multiply two matrices. The  *
-* header of the method is:                                                       *
-*                                                                                *
-* public static double[][] multiplyMatrix(double[][] a, double[][] b)            *
-*                                                                                *
-* To multiply matrix a by matrix b, the number of columns in a must be the same  *
-* as the number of rows in b, and the two matrices must have elements of the same*
-* or compatible types. Let c be the result of the multiplication. Assume the     *
-* column size of matrix a is n. Each element cij is ai1 * b1j + ai2 * b2j + ...  *
-* + ain * bnj.                                                                   *
-*                                                                                *
-* Write a test program that prompts the user to enter two 3 * 3 matrices and     *
-* displays their product.                                                        *
-*********************************************************************************/
-
+/**
+ *
+ * @author clairericks
+ */
 import java.util.Scanner;
 
 public class Exercise08_06 {
